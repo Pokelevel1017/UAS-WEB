@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPA Library</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0d1117;
+    color:#fff;
+}
+
+header{
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #222;
+    position:sticky;
+    top:0;
+    background:#0d1117;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    color:#4da3ff;
+}
+
+input{
+    padding:10px;
+    width:300px;
+    border-radius:10px;
+    border:none;
+    outline:none;
+    background:#161b22;
+    color:white;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:15px;
+    padding:20px;
+}
+
+.card{
+    background:#161b22;
+    border:1px solid #2a2f3a;
+    border-radius:15px;
+    padding:15px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.card img{
+    width:60px;
+    height:60px;
+    border-radius:12px;
+}
+
+.card h3{
+    margin:10px 0 5px;
+}
+
+.small{
+    color:#aaa;
+    font-size:13px;
+}
+
+.modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-content{
+    background:#161b22;
+    padding:20px;
+    width:90%;
+    max-width:700px;
+    border-radius:15px;
+    position:relative;
+    max-height:90vh;
+    overflow:auto;
+}
+
+.close{
+    position:absolute;
+    right:15px;
+    top:10px;
+    cursor:pointer;
+    font-size:22px;
+}
+
+button{
+    background:#4da3ff;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    color:white;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.screenshots img{
+    height:200px;
+    margin-right:10px;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">IPA Library</div>
+<input id="search" placeholder="Search apps...">
+</header>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal()">✖</span>
+<div id="modalBody"></div>
+</div>
+</div>
+
+<script>
+
+const API_URL = "https://pokelevel1017.github.io/UAS/apps.json";
+
+let apps = [];
+
+async function loadApps(){
+    const res = await fetch(API_URL);
+    apps = await res.json();
+    render(apps);
+}
+
+function render(list){
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    list.forEach(app => {
+        const latest = app.versions?.[0];
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="${app.iconURL}">
+            <h3>${app.name}</h3>
+            <div class="small">${app.subtitle || ""}</div>
+            <div class="small">${app.developerName || ""}</div>
+            <div class="small">v${latest?.version || "?"}</div>
+        `;
+
+        card.onclick = () => openApp(app);
+        grid.appendChild(card);
+    });
+}
+
+function openApp(app){
+    const latest = app.versions?.[0];
+
+    document.getElementById("modalBody").innerHTML = `
+        <h2>${app.name}</h2>
+        <p>${app.subtitle || ""}</p>
+        <p class="small">${app.developerName}</p>
+
+        <p style="margin-top:10px">
+            ${app.localizedDescription || "No description"}
+        </p>
+
+        <a href="${latest?.downloadURL}" target="_blank">
+            <button>Download IPA</button>
+        </a>
+
+        <h3>Bundle ID</h3>
+        <p class="small">${app.bundleIdentifier}</p>
+
+        <h3>Screenshots</h3>
+        <div class="screenshots">
+            ${(app.screenshots || []).map(s => `<img src="${s}">`).join("")}
+        </div>
+    `;
+
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display = "none";
+}
+
+document.getElementById("search").addEventListener("input", e => {
+    const q = e.target.value.toLowerCase();
+
+    render(apps.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        (a.subtitle || "").toLowerCase().includes(q) ||
+        (a.developerName || "").toLowerCase().includes(q)
+    ));
+});
+
+loadApps();
+
+</script>
+
+</body>
+</html>
