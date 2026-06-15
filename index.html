@@ -71,11 +71,6 @@ input{
     transition:0.2s;
 }
 
-.cat:hover{
-    transform:scale(1.05);
-    border-color:#7ab7ff;
-}
-
 .cat.active{
     background:#7ab7ff;
     color:#000;
@@ -98,13 +93,6 @@ input{
     padding:15px;
     cursor:pointer;
     transition:0.25s;
-    opacity:0;
-    transform:translateY(15px);
-    animation:fadeIn 0.4s forwards;
-}
-
-@keyframes fadeIn{
-    to{opacity:1;transform:translateY(0);}
 }
 
 .card:hover{
@@ -157,7 +145,6 @@ h3{font-size:15px;}
     border-radius:20px;
     padding:22px;
     animation:pop 0.25s forwards;
-    position:relative;
 }
 
 @keyframes pop{
@@ -173,18 +160,13 @@ h3{font-size:15px;}
 }
 
 .app-header img{
-    width:78px;height:78px;border-radius:18px;
+    width:78px;
+    height:78px;
+    border-radius:18px;
 }
 
 .app-title h2{margin:0;font-size:20px;}
 .app-title .sub{font-size:13px;color:#9aa4b2;}
-
-.badge-row{
-    display:flex;
-    gap:8px;
-    margin-top:8px;
-    flex-wrap:wrap;
-}
 
 .badge{
     font-size:11px;
@@ -192,6 +174,12 @@ h3{font-size:15px;}
     border-radius:8px;
     background:#1b2233;
     color:#cbd5e1;
+}
+
+.badge-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
 }
 
 .section{margin-top:18px;}
@@ -238,43 +226,60 @@ h3{font-size:15px;}
 
 <script>
 
-const APPS_URL = "apps.json";
-const CATEGORIES_URL = "categories.json";
+/* 🔥 CHANGE THESE TWO LINKS */
+const APPS_URL = "https://pokelevel1017.github.io/UAS/apps.json";
+const CATEGORIES_URL = "https://pokelevel1017.github.io/UAS-WEB/categories.json";
 
-let apps = {};
+/* DATA */
+let apps = [];
+let appMap = {};
 let categories = {};
-let currentCategory = "Emulators";
+let currentCategory = null;
 
 function formatSize(bytes){
     if(!bytes) return "Unknown";
     return (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
 
+/* LOAD DATA */
 async function loadData(){
-    const [appsRes, catRes] = await Promise.all([
-        fetch(APPS_URL),
-        fetch(CATEGORIES_URL)
-    ]);
+    try {
+        const [appsRes, catRes] = await Promise.all([
+            fetch(APPS_URL),
+            fetch(CATEGORIES_URL)
+        ]);
 
-    const appsData = await appsRes.json();
-    categories = await catRes.json();
+        const appsData = await appsRes.json();
+        categories = await catRes.json();
 
-    // convert apps array → map by id
-    appsData.forEach(app => {
-        apps[app.id] = app;
-    });
+        apps = appsData;
 
-    buildCategories();
-    render();
+        /* build map */
+        appMap = {};
+        apps.forEach(app=>{
+            appMap[app.id] = app;
+        });
+
+        buildCategories();
+
+        currentCategory = Object.keys(categories)[0];
+        render();
+
+    } catch (e) {
+        console.error("Failed loading:", e);
+        document.getElementById("grid").innerHTML =
+            "<p style='padding:20px'>Failed to load apps.json or categories.json</p>";
+    }
 }
 
+/* CATEGORY BUTTONS */
 function buildCategories(){
     const bar = document.getElementById("catBar");
     bar.innerHTML = "";
 
     Object.keys(categories).forEach(cat=>{
         const btn = document.createElement("div");
-        btn.className = "cat" + (cat===currentCategory?" active":"");
+        btn.className = "cat";
         btn.innerText = cat;
 
         btn.onclick = ()=>{
@@ -286,31 +291,32 @@ function buildCategories(){
 
         bar.appendChild(btn);
     });
+
+    document.querySelectorAll(".cat")[0]?.classList.add("active");
 }
 
+/* RENDER */
 function render(){
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
-    let ids = categories[currentCategory] || [];
+    const ids = categories[currentCategory] || [];
 
     const q = document.getElementById("search").value.toLowerCase();
 
-    ids = ids
-        .map(id => apps[id])
-        .filter(app => app)
-        .filter(app =>
-            app.name.toLowerCase().includes(q) ||
-            (app.subtitle||"").toLowerCase().includes(q)
-        );
-
-    ids.forEach((app,i)=>{
+    ids
+    .map(id => appMap[id])
+    .filter(app => app)
+    .filter(app =>
+        app.name.toLowerCase().includes(q) ||
+        (app.subtitle||"").toLowerCase().includes(q)
+    )
+    .forEach(app=>{
 
         const latest = app.versions?.[0];
 
         const card = document.createElement("div");
         card.className = "card";
-        card.style.animationDelay = `${i*0.03}s`;
 
         card.innerHTML = `
             <div class="top">
@@ -333,6 +339,7 @@ function render(){
     });
 }
 
+/* MODAL */
 function openApp(app){
     const latest = app.versions?.[0];
 
@@ -341,7 +348,7 @@ function openApp(app){
     document.getElementById("modalBody").innerHTML = `
         <div class="app-header">
             <img src="${app.iconURL}">
-            <div class="app-title">
+            <div>
                 <h2>${app.name}</h2>
                 <div class="sub">${app.subtitle||""}</div>
 
