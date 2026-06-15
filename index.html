@@ -168,18 +168,18 @@ h3{font-size:15px;}
 .app-title h2{margin:0;font-size:20px;}
 .app-title .sub{font-size:13px;color:#9aa4b2;}
 
+.badge-row{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
 .badge{
     font-size:11px;
     padding:4px 8px;
     border-radius:8px;
     background:#1b2233;
     color:#cbd5e1;
-}
-
-.badge-row{
-    display:flex;
-    gap:8px;
-    margin-top:8px;
 }
 
 .section{margin-top:18px;}
@@ -226,15 +226,26 @@ h3{font-size:15px;}
 
 <script>
 
-/* 🔥 CHANGE THESE TWO LINKS */
+/* ✅ FIXED RAW GITHUB LINKS */
 const APPS_URL = "https://pokelevel1017.github.io/UAS/apps.json";
-const CATEGORIES_URL = "https://pokelevel1017.github.io/UAS-WEB/categories.json";
+const CATEGORIES_URL = "https://raw.githubusercontent.com/pokelevel1017/UAS-WEB/main/categories.json";
 
-/* DATA */
 let apps = [];
 let appMap = {};
 let categories = {};
 let currentCategory = null;
+
+/* SAFE FETCH */
+async function fetchJSON(url){
+    const res = await fetch(url);
+    const text = await res.text();
+
+    try{
+        return JSON.parse(text);
+    }catch(e){
+        throw new Error("Invalid JSON from " + url);
+    }
+}
 
 function formatSize(bytes){
     if(!bytes) return "Unknown";
@@ -243,36 +254,42 @@ function formatSize(bytes){
 
 /* LOAD DATA */
 async function loadData(){
-    try {
-        const [appsRes, catRes] = await Promise.all([
-            fetch(APPS_URL),
-            fetch(CATEGORIES_URL)
+    try{
+
+        const [appsData, catData] = await Promise.all([
+            fetchJSON(APPS_URL),
+            fetchJSON(CATEGORIES_URL)
         ]);
 
-        const appsData = await appsRes.json();
-        categories = await catRes.json();
+        apps = Array.isArray(appsData) ? appsData : [];
 
-        apps = appsData;
+        categories = catData;
 
         /* build map */
         appMap = {};
         apps.forEach(app=>{
-            appMap[app.id] = app;
+            if(app.id) appMap[app.id] = app;
         });
 
         buildCategories();
 
         currentCategory = Object.keys(categories)[0];
+
         render();
 
-    } catch (e) {
-        console.error("Failed loading:", e);
-        document.getElementById("grid").innerHTML =
-            "<p style='padding:20px'>Failed to load apps.json or categories.json</p>";
+    } catch(err){
+        document.getElementById("grid").innerHTML = `
+            <div style="padding:20px;color:red">
+                <h3>Load Failed</h3>
+                <p>${err.message}</p>
+                <p>Check console (F12)</p>
+            </div>
+        `;
+        console.error(err);
     }
 }
 
-/* CATEGORY BUTTONS */
+/* CATEGORY UI */
 function buildCategories(){
     const bar = document.getElementById("catBar");
     bar.innerHTML = "";
@@ -295,7 +312,7 @@ function buildCategories(){
     document.querySelectorAll(".cat")[0]?.classList.add("active");
 }
 
-/* RENDER */
+/* RENDER APPS */
 function render(){
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
@@ -306,7 +323,7 @@ function render(){
 
     ids
     .map(id => appMap[id])
-    .filter(app => app)
+    .filter(Boolean)
     .filter(app =>
         app.name.toLowerCase().includes(q) ||
         (app.subtitle||"").toLowerCase().includes(q)
@@ -370,8 +387,10 @@ function openApp(app){
     `;
 }
 
+/* SEARCH */
 document.getElementById("search").addEventListener("input", render);
 
+/* START */
 loadData();
 
 </script>
