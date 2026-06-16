@@ -263,9 +263,7 @@ input:focus{
     transform:translateX(-50%) translateY(-4px);
 }
 
-/* =========================
-   MOBILE FIX (ADDED ONLY)
-========================= */
+/* MOBILE FIX */
 @media (max-width: 768px){
 
     header{
@@ -456,15 +454,8 @@ function openRepo(){
 
     <div class="repo-list">
 
-        <button onclick="toast('Added ✔ AltStore')">AltStore</button>
-        <button onclick="toast('Added ✔ SideStore')">SideStore</button>
-        <button onclick="toast('Added ✔ Scarlet')">Scarlet</button>
-        <button onclick="toast('Added ✔ Feather')">Feather</button>
-        <button onclick="toast('Added ✔ KSign')">KSign</button>
-        <button onclick="toast('Added ✔ eSign')">eSign</button>
-
         <button onclick="
-            navigator.clipboard.writeText(url)
+            navigator.clipboard.writeText('${API}')
             .then(()=>toast('Repo URL Copied ✔'))
             .catch(()=>toast('Error copying URL'))
         ">
