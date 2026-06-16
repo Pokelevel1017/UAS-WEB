@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Universal App Store</title>
 
+<!-- ⭐ SATURN FAVICON ADDED -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2210%22%20fill%3D%22%237ab7ff%22%2F%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2232%22%20rx%3D%2220%22%20ry%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%239aa4b2%22%20stroke-width%3D%223%22%2F%3E%3C%2Fsvg%3E">
+
 <style>
 *{
     margin:0;
@@ -261,71 +264,6 @@ input:focus{
     transform:translateX(-50%) translateY(-4px);
 }
 
-/* =========================
-   📱 MOBILE FIX (ADDED)
-========================= */
-@media (max-width: 768px){
-
-    header{
-        flex-direction:column;
-        align-items:stretch;
-        gap:10px;
-    }
-
-    .right-tools{
-        width:100%;
-        display:flex;
-        gap:10px;
-    }
-
-    input{
-        width:100%;
-        flex:1;
-    }
-
-    .repo-launch{
-        white-space:nowrap;
-    }
-
-    .grid{
-        grid-template-columns:repeat(2,1fr);
-        gap:12px;
-        padding:14px;
-    }
-
-    .card{
-        padding:12px;
-    }
-
-    .card-icon{
-        width:48px;
-        height:48px;
-    }
-
-    .card-title h3{
-        font-size:13px;
-    }
-
-    .card-title .sub{
-        font-size:10.5px;
-    }
-
-    .card-meta{
-        font-size:10.5px;
-    }
-
-    .modal-content{
-        width:95%;
-        padding:16px;
-        border-radius:14px;
-    }
-
-    .download{
-        padding:10px;
-        font-size:14px;
-    }
-}
-
 </style>
 </head>
 
@@ -442,7 +380,6 @@ function openRepo(){
     <div class="close" onclick="closeModal()">✕</div>
 
     <h2>Add Repo</h2>
-    <div style="color:#9aa4b2;font-size:12px;margin-top:6px;">${url}</div>
 
     <div class="repo-list">
 
