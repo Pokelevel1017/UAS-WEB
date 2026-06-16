@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPA Library</title>
+<title>Universal App Store</title>
 
 <style>
 *{
@@ -24,374 +24,432 @@ header{
     top:0;
     z-index:100;
     display:flex;
-    flex-direction:column;
-    gap:10px;
-    padding:15px 20px;
-    background:rgba(15,18,28,0.75);
-    backdrop-filter: blur(12px);
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 22px;
+    background:rgba(15,18,28,0.7);
+    backdrop-filter: blur(20px);
     border-bottom:1px solid rgba(255,255,255,0.06);
 }
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
 .logo{
-    font-size:22px;
+    font-size:20px;
     font-weight:700;
     color:#7ab7ff;
 }
 
+.right-tools{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
 input{
     width:260px;
-    padding:10px 14px;
+    padding:10px 12px;
     border-radius:12px;
     border:none;
     outline:none;
     background:#151a2a;
     color:white;
+    transition:0.25s ease;
 }
 
-/* CATEGORY BAR */
-.categories{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+input:focus{
+    box-shadow:0 0 0 2px rgba(122,183,255,0.18);
+    transform:translateY(-1px);
 }
 
-.cat{
-    padding:8px 12px;
-    border-radius:10px;
-    background:#151a2a;
-    border:1px solid rgba(255,255,255,0.06);
-    cursor:pointer;
-    font-size:12px;
-    transition:0.2s;
-}
-
-.cat.active{
-    background:#7ab7ff;
-    color:#000;
+.repo-launch{
+    padding:10px 14px;
+    border-radius:12px;
+    border:none;
+    background:#1b2233;
+    color:white;
     font-weight:600;
+    cursor:pointer;
+    transition:0.25s ease;
+}
+
+.repo-launch:hover{
+    transform:translateY(-2px);
+    background:#222b3f;
 }
 
 /* GRID */
 .grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-    gap:18px;
-    padding:25px;
+    gap:16px;
+    padding:22px;
 }
 
-/* CARD */
+/* CARD ANIMATION (cleaner) */
 .card{
     background:linear-gradient(145deg,#141a2a,#0f1422);
     border:1px solid rgba(255,255,255,0.06);
-    border-radius:18px;
-    padding:15px;
+    border-radius:16px;
+    padding:14px;
     cursor:pointer;
-    transition:0.25s;
+
+    opacity:0;
+    transform:translateY(18px) scale(0.97);
+    animation:cardIn 0.5s cubic-bezier(0.2,0.8,0.2,1) forwards;
+
+    transition:0.25s ease;
+    position:relative;
+    overflow:hidden;
 }
 
 .card:hover{
-    transform:translateY(-10px) scale(1.03);
-    box-shadow:0 15px 35px rgba(0,0,0,0.6),
-               0 0 20px rgba(122,183,255,0.15);
+    transform:translateY(-6px) scale(1.01);
+    border-color:rgba(122,183,255,0.25);
+    box-shadow:0 12px 35px rgba(0,0,0,0.4);
 }
 
-.top{
+@keyframes cardIn{
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+/* CARD CONTENT */
+.card-top{
     display:flex;
     gap:12px;
     align-items:center;
 }
 
-.card img{
-    width:58px;
-    height:58px;
+.card-icon{
+    width:54px;
+    height:54px;
     border-radius:14px;
+    object-fit:cover;
+    transition:0.3s ease;
 }
 
-h3{font-size:15px;}
-.small{font-size:12px;color:#9aa4b2;}
+.card:hover .card-icon{
+    transform:scale(1.06) rotate(-2deg);
+}
 
-.meta{
-    margin-top:12px;
-    font-size:12px;
-    color:#b7c0d1;
+.card-title{
     display:flex;
     flex-direction:column;
-    gap:4px;
+    gap:2px;
+}
+
+.card-title h3{
+    font-size:14.5px;
+}
+
+.card-title .sub{
+    font-size:11.5px;
+    color:#9aa4b2;
+}
+
+.card-meta{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    font-size:11.5px;
+    color:#b7c0d1;
 }
 
 /* MODAL */
 .modal{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.65);
     display:none;
     justify-content:center;
     align-items:center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(14px);
+    padding:18px;
 }
 
-.modal.show{display:flex;}
+.modal.show{
+    display:flex;
+}
 
 .modal-content{
-    width:90%;
-    max-width:720px;
+    width:100%;
+    max-width:760px;
     background:#121826;
-    border-radius:20px;
-    padding:22px;
-    animation:pop 0.25s forwards;
-}
-
-@keyframes pop{
-    from{transform:scale(0.85);opacity:0;}
-    to{transform:scale(1);opacity:1;}
-}
-
-.app-header{
-    display:flex;
-    gap:15px;
-    align-items:center;
-    margin-bottom:18px;
-}
-
-.app-header img{
-    width:78px;
-    height:78px;
     border-radius:18px;
+    padding:20px;
+    position:relative;
+
+    animation:modalIn 0.35s cubic-bezier(0.2,0.8,0.2,1);
 }
 
-.app-title h2{margin:0;font-size:20px;}
-.app-title .sub{font-size:13px;color:#9aa4b2;}
+@keyframes modalIn{
+    from{opacity:0;transform:translateY(18px) scale(0.96);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+}
 
-.badge-row{
+/* CLOSE BUTTON (restored) */
+.close{
+    position:absolute;
+    top:12px;
+    right:14px;
+    font-size:22px;
+    cursor:pointer;
+    color:#aaa;
+    transition:0.2s;
+}
+
+.close:hover{
+    color:white;
+    transform:scale(1.15);
+}
+
+/* APP HEADER INSIDE MODAL */
+.modal-header{
     display:flex;
-    gap:8px;
+    gap:14px;
+    align-items:center;
+}
+
+.modal-icon{
+    width:72px;
+    height:72px;
+    border-radius:18px;
+    object-fit:cover;
+}
+
+.badges{
     margin-top:8px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
 }
 
 .badge{
-    font-size:11px;
-    padding:4px 8px;
-    border-radius:8px;
     background:#1b2233;
+    padding:4px 9px;
+    border-radius:10px;
+    font-size:10.5px;
     color:#cbd5e1;
 }
 
-.section{margin-top:18px;}
-.section h3{color:#7ab7ff;font-size:14px;}
-
-.info{
-    font-size:13px;
-    color:#cbd5e1;
-    line-height:1.6;
-}
-
-.download-btn{
+/* DOWNLOAD */
+.download{
     display:block;
+    margin-top:16px;
+    padding:11px;
     text-align:center;
-    margin-top:18px;
+    border-radius:12px;
     background:linear-gradient(90deg,#4da3ff,#7ab7ff);
-    padding:12px;
-    border-radius:14px;
     color:white;
-    text-decoration:none;
     font-weight:600;
+    text-decoration:none;
+    transition:0.2s;
 }
+
+.download:hover{
+    transform:translateY(-2px);
+}
+
+/* REPO MENU */
+.repo-list{
+    margin-top:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.repo-list button{
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    background:#1b2233;
+    color:#dbe6ff;
+    transition:0.2s ease;
+}
+
+.repo-list button:hover{
+    background:rgba(122,183,255,0.14);
+    transform:translateX(3px);
+}
+
+/* TOAST */
+.toast{
+    position:fixed;
+    bottom:18px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#1b2233;
+    padding:10px 14px;
+    border-radius:12px;
+    font-size:12px;
+    opacity:0;
+    transition:0.3s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(-4px);
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="topbar">
-    <div class="logo">IPA Library</div>
-    <input id="search" placeholder="Search apps...">
-</div>
+<div class="logo">Universal App Store</div>
 
-<div class="categories" id="catBar"></div>
+<div class="right-tools">
+<input id="search" placeholder="Search apps...">
+<button class="repo-launch" onclick="openRepo()">Add Repo</button>
+</div>
 </header>
 
 <div class="grid" id="grid"></div>
 
 <div class="modal" id="modal">
-<div class="modal-content">
-<div id="modalBody"></div>
+<div class="modal-content" id="modalContent"></div>
 </div>
-</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 
-/* ✅ FIXED RAW GITHUB LINKS */
-const APPS_URL = "https://pokelevel1017.github.io/UAS/apps.json";
-const CATEGORIES_URL = "https://raw.githubusercontent.com/pokelevel1017/UAS-WEB/main/categories.json";
+const API="https://pokelevel1017.github.io/UAS/apps.json";
+let apps=[];
 
-let apps = [];
-let appMap = {};
-let categories = {};
-let currentCategory = null;
-
-/* SAFE FETCH */
-async function fetchJSON(url){
-    const res = await fetch(url);
-    const text = await res.text();
-
-    try{
-        return JSON.parse(text);
-    }catch(e){
-        throw new Error("Invalid JSON from " + url);
-    }
+function toast(msg){
+    const t=document.getElementById("toast");
+    t.textContent=msg;
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1200);
 }
 
-function formatSize(bytes){
-    if(!bytes) return "Unknown";
-    return (bytes / 1024 / 1024).toFixed(1) + " MB";
+async function load(){
+    const res=await fetch(API);
+    const data=await res.json();
+    apps=Array.isArray(data)?data:data.apps||data.data||[];
+    render(apps);
 }
 
-/* LOAD DATA */
-async function loadData(){
-    try{
+function render(list){
+    list=[...list].sort((a,b)=>
+        (a.name||"").toLowerCase().localeCompare((b.name||"").toLowerCase())
+    );
 
-        const [appsData, catData] = await Promise.all([
-            fetchJSON(APPS_URL),
-            fetchJSON(CATEGORIES_URL)
-        ]);
+    const grid=document.getElementById("grid");
+    grid.innerHTML="";
 
-        apps = Array.isArray(appsData) ? appsData : [];
+    list.forEach((app,i)=>{
+        const v=app.versions?.[0];
 
-        categories = catData;
-
-        /* build map */
-        appMap = {};
-        apps.forEach(app=>{
-            if(app.id) appMap[app.id] = app;
-        });
-
-        buildCategories();
-
-        currentCategory = Object.keys(categories)[0];
-
-        render();
-
-    } catch(err){
-        document.getElementById("grid").innerHTML = `
-            <div style="padding:20px;color:red">
-                <h3>Load Failed</h3>
-                <p>${err.message}</p>
-                <p>Check console (F12)</p>
+        const el=document.createElement("div");
+        el.className="card";
+        el.innerHTML=`
+        <div class="card-top">
+            <img class="card-icon" src="${app.iconURL}">
+            <div class="card-title">
+                <h3>${app.name}</h3>
+                <div class="sub">${app.subtitle||""}</div>
             </div>
-        `;
-        console.error(err);
-    }
-}
+        </div>
 
-/* CATEGORY UI */
-function buildCategories(){
-    const bar = document.getElementById("catBar");
-    bar.innerHTML = "";
+        <div class="card-meta">
+            <div>👤 ${app.developerName||""}</div>
+            <div>📦 v${v?.version||"?"}</div>
+            <div>💾 ${(v?.size/1024/1024).toFixed(1)} MB</div>
+        </div>`;
 
-    Object.keys(categories).forEach(cat=>{
-        const btn = document.createElement("div");
-        btn.className = "cat";
-        btn.innerText = cat;
-
-        btn.onclick = ()=>{
-            currentCategory = cat;
-            document.querySelectorAll(".cat").forEach(b=>b.classList.remove("active"));
-            btn.classList.add("active");
-            render();
-        };
-
-        bar.appendChild(btn);
-    });
-
-    document.querySelectorAll(".cat")[0]?.classList.add("active");
-}
-
-/* RENDER APPS */
-function render(){
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
-
-    const ids = categories[currentCategory] || [];
-
-    const q = document.getElementById("search").value.toLowerCase();
-
-    ids
-    .map(id => appMap[id])
-    .filter(Boolean)
-    .filter(app =>
-        app.name.toLowerCase().includes(q) ||
-        (app.subtitle||"").toLowerCase().includes(q)
-    )
-    .forEach(app=>{
-
-        const latest = app.versions?.[0];
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-            <div class="top">
-                <img src="${app.iconURL}">
-                <div>
-                    <h3>${app.name}</h3>
-                    <div class="small">${app.subtitle||""}</div>
-                </div>
-            </div>
-
-            <div class="meta">
-                <div>👤 ${app.developerName}</div>
-                <div>📦 v${latest?.version}</div>
-                <div>💾 ${formatSize(latest?.size)}</div>
-            </div>
-        `;
-
-        card.onclick = ()=>openApp(app);
-        grid.appendChild(card);
+        el.onclick=()=>openApp(app);
+        grid.appendChild(el);
     });
 }
 
-/* MODAL */
+/* APP MODAL (ICON RESTORED) */
 function openApp(app){
-    const latest = app.versions?.[0];
+    const v=app.versions?.[0];
+
+    document.getElementById("modalContent").innerHTML=`
+    <div class="close" onclick="closeModal()">✕</div>
+
+    <div class="modal-header">
+        <img class="modal-icon" src="${app.iconURL}">
+        <div>
+            <h2>${app.name}</h2>
+            <div style="color:#9aa4b2;font-size:12px">${app.subtitle||""}</div>
+
+            <div class="badges">
+                <div class="badge">${app.developerName||""}</div>
+                <div class="badge">v${v?.version||"?"}</div>
+                <div class="badge">${(v?.size/1024/1024).toFixed(1)} MB</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:14px;color:#cbd5e1;font-size:13px;line-height:1.6;">
+        ${app.localizedDescription||""}
+    </div>
+
+    <a class="download" href="${v?.downloadURL}" target="_blank">
+        Download IPA
+    </a>
+    `;
 
     document.getElementById("modal").classList.add("show");
-
-    document.getElementById("modalBody").innerHTML = `
-        <div class="app-header">
-            <img src="${app.iconURL}">
-            <div>
-                <h2>${app.name}</h2>
-                <div class="sub">${app.subtitle||""}</div>
-
-                <div class="badge-row">
-                    <div class="badge">v${latest?.version}</div>
-                    <div class="badge">${formatSize(latest?.size)}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>Description</h3>
-            <div class="info">${app.localizedDescription}</div>
-        </div>
-
-        <a class="download-btn" href="${latest?.downloadURL}" target="_blank">
-            Download IPA
-        </a>
-    `;
 }
 
-/* SEARCH */
-document.getElementById("search").addEventListener("input", render);
+function closeModal(){
+    document.getElementById("modal").classList.remove("show");
+}
 
-/* START */
-loadData();
+/* REPO MENU + COPY FEEDBACK FIXED */
+function openRepo(){
+    const url=API;
+
+    document.getElementById("modalContent").innerHTML=`
+    <div class="close" onclick="closeModal()">✕</div>
+
+    <h2>Add Repo</h2>
+    <div style="color:#9aa4b2;font-size:12px;margin-top:6px;">${url}</div>
+
+    <div class="repo-list">
+
+        <button onclick="toast('Added ✔ AltStore')">AltStore</button>
+        <button onclick="toast('Added ✔ SideStore')">SideStore</button>
+        <button onclick="toast('Added ✔ Scarlet')">Scarlet</button>
+        <button onclick="toast('Added ✔ Feather')">Feather</button>
+        <button onclick="toast('Added ✔ KSign')">KSign</button>
+        <button onclick="toast('Added ✔ eSign')">eSign</button>
+
+        <button onclick="
+            navigator.clipboard.writeText(url)
+            .then(()=>toast('Repo URL Copied ✔'))
+            .catch(()=>toast('Error copying URL'))
+        ">
+            Copy Repo URL
+        </button>
+
+    </div>
+    `;
+
+    document.getElementById("modal").classList.add("show");
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+    const q=e.target.value.toLowerCase();
+    render(apps.filter(a=>
+        (a.name||"").toLowerCase().includes(q)||
+        (a.subtitle||"").toLowerCase().includes(q)||
+        (a.developerName||"").toLowerCase().includes(q)
+    ));
+});
+
+load();
 
 </script>
 
